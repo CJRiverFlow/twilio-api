@@ -1,67 +1,27 @@
 const express = require('express');
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
-const urlencoded = require('body-parser').urlencoded;
+const urlencoded = require('body-parser').urlencoded; //needed to work with Twilio and avoid empty messages
 
 const app = express()
 app.use(urlencoded({ extended: false }));
 const port = 1337
 
 /*
-Working with npm package
-*/
-app.post('/voice_test', (request, response) => {
-    // Using twilio library
-    const twiml = new VoiceResponse();
-    
-    const gather = twiml.gather({
-      input: 'speech',
-      language: 'es-UY',
-      speechTimeout: 'auto',
-      action: '/command_test',
-      method:"POST"
-    });
-  
-    gather.say({
-      voice: 'Polly.Conchita',
-    }, 'Bienvenido mi amigo, cómo puedo ayudarte?')
-
-    var response_message=twiml.toString()
-    console.log(response_message)
-    
-    response.type('text/xml');
-    response.send(response_message);
-    });
-    
-
-app.post('/command_test', (request, response) => {
-    // Use the Twilio Node.js SDK to build an XML response
-    const twiml = new VoiceResponse();
-    var message = request.body.SpeechResult
-
-    twiml.say({
-        voice: 'Polly.Conchita'
-    },request.body.SpeechResult);
-
-    twiml.redirect({method:'POST'}, '/voice_test')
-
-    response.type('text/xml');
-    response.send(twiml.toString());
-});
-
-
-/*
 Using twiML string directly
-This could work better if we predesignthe message.
-CURRENTLY USING THIS ON WEBHOOK
+This could work better if we predesign the message.
+CURRENTLY USING THIS ON WEBHOOK APP
 */
 app.post('/voice', (request,response) =>{
+    //Just to execute the WELCOME intent message
+    console.log(`Inbound call`)
     response.type('text/xml');
     response.send(`
     <Response>
-        <Gather action="/command" input='speech' language='es-UY' speechTimeout='auto'>
-            <Say voice='Polly.Lupe-Neural'>
+        <Gather action="/loop" input='speech' language='es-UY' speechTimeout='auto'>
+            <Say voice='Polly.Mia'>
                 <prosody rate="medium">
-                    Bienvenido mi amigo, cómo puedo ayudarte?
+                    Bienvenido a agenda médica, puedo ayudarte a agendar o modificar tus citas. 
+                    Qué desea realizar?
                 </prosody>
             </Say>
         </Gather>
@@ -70,24 +30,26 @@ app.post('/voice', (request,response) =>{
 });
 
 
-app.post('/command', (request,response) =>{
+app.post('/loop', (request,response) =>{
+    /*
+    Loop process to speak-listen continouos flow.
+    */
     var message = request.body.SpeechResult
-
+    console.log(message)
     response.type('text/xml');
     response.send(`
     <Response>
+        <Gather action="/loop" input='speech' language='es-UY' speechTimeout='auto'>
             <Say voice='Polly.Lupe-Neural'>
                 <prosody rate="medium">
-                    Has dicho: ${message}
+                    Tu mensaje fue: ${message}
                 </prosody>
             </Say>
-            <Redirect method='POST'>/voice</Redirect>
+        </Gather>
     </Response>
     `);
 });
 
-
-
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`Twilio app listening at http://localhost:${port}`)
   })
