@@ -1,5 +1,5 @@
 const express = require('express');
-const VoiceResponse = require('twilio').twiml.VoiceResponse;
+//const VoiceResponse = require('twilio').twiml.VoiceResponse;
 const urlencoded = require('body-parser').urlencoded; //needed to work with Twilio and avoid empty messages
 
 const app = express()
@@ -18,8 +18,8 @@ app.post('/voice', (request,response) =>{
     response.send(`
     <Response>
         <Gather action="/loop" input='speech' language='es-UY' speechTimeout='auto'>
-            <Say voice='Polly.Mia'>
-                <prosody rate="medium">
+            <Say voice='Polly.Lupe-Neural'>
+                <prosody rate="90%">
                     Bienvenido a agenda médica, puedo ayudarte a agendar o modificar tus citas. 
                     Qué desea realizar?
                 </prosody>
@@ -41,7 +41,7 @@ app.post('/loop', (request,response) =>{
     <Response>
         <Gather action="/loop" input='speech' language='es-UY' speechTimeout='auto'>
             <Say voice='Polly.Lupe-Neural'>
-                <prosody rate="medium">
+                <prosody rate="90%">
                     Tu mensaje fue: ${message}
                 </prosody>
             </Say>
