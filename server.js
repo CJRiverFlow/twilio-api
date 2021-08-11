@@ -21,13 +21,13 @@ app.post('/voice', (request,response) =>{
     response.type('text/xml');
     response.send(`
     <Response>
+        <Say voice='Polly.Lupe-Neural'>
+            <prosody rate="90%">
+                Bienvenido a agenda médica, puedo ayudarte a agendar o modificar tus citas. 
+                Qué desea realizar?
+            </prosody>
+        </Say>
         <Gather action="/loop" input='speech' language='es-UY' speechTimeout='auto'>
-            <Say voice='Polly.Lupe-Neural'>
-                <prosody rate="90%">
-                    Bienvenido a agenda médica, puedo ayudarte a agendar o modificar tus citas. 
-                    Qué desea realizar?
-                </prosody>
-            </Say>
         </Gather>
     </Response>
     `);
@@ -51,16 +51,16 @@ app.post('/loop', (request,response) =>{
     response.type('text/xml');
     response.send(`
     <Response>
-        <Gather action="/loop" input='speech' language='es-UY' speechTimeout='auto' actionOnEmptyResult="true">
-            <Say voice='Polly.Lupe-Neural'>
-                <prosody rate="90%">
-                    ${message}
-                </prosody>
-            </Say>
+        <Say voice='Polly.Lupe-Neural'>
+            <prosody rate="90%">
+                ${message}
+            </prosody>
+        </Say>
+        <Gather action="/loop" input='speech' language='es-UY' speechTimeout='auto' actionOnEmptyResult="true">     
+        </Gather>
         <Redirect method="POST">
             /loop
         </Redirect>
-        </Gather>
     </Response>
     `);
 });
